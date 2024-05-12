@@ -1,21 +1,29 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Để loại bỏ Log trong quá trình biên dịch
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Đảm bảo không mã hóa các class và phương thức được sử dụng trong Annotation
+-keepattributes *Annotation*
+-keepclassmembers class * {
+    @com.example.annotation.* <methods>;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Không mã hóa và loại bỏ các class được sử dụng trong AndroidManifest.xml
+-keep class com.example.activities.MainActivity { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Không loại bỏ các class và phương thức sử dụng Reflection
+-keep class com.example.reflection.** { *; }
+-dontwarn com.example.reflection.**
+
+# Không loại bỏ các class và phương thức trong package com.example.models
+-keep class com.example.models.** { *; }
+
+# Không loại bỏ các thư viện bên thứ ba
+-keep class org.example.library.** { *; }
+-dontwarn org.example.library.**

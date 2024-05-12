@@ -1,95 +1,87 @@
 package com.example.finalmobileproject.Activities;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.widget.Toast;
 
-import com.example.finalmobileproject.R;
 import com.example.finalmobileproject.databinding.ActivityLoginBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends BaseActivity {
-    ActivityLoginBinding binding;
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private ActivityLoginBinding binding;
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setVariable();
-        toSignUp();
+        mAuth = FirebaseAuth.getInstance();
 
+        setVariables();
     }
 
     @Override
     public void onBackPressed() {
         ComponentName callingActivityName = getCallingActivity();
         if (callingActivityName != null) {
-            Activity callingActivity = getActivityFromComponentName(callingActivityName);
-            if (callingActivity != null) {
-                String backActivity = callingActivity.getLocalClassName();
-                if (backActivity.equals("MainActivity")) {
-                    Toast.makeText(LoginActivity.this, "Can not back", Toast.LENGTH_SHORT).show();
-                } else {
-                    super.onBackPressed();
-                }
+            String backActivity = callingActivityName.getClassName();
+            if (backActivity.equals("com.example.finalmobileproject.Activities.MainActivity")) {
+                Toast.makeText(LoginActivity.this, "Cannot go back", Toast.LENGTH_SHORT).show();
+                return;
             }
         }
+        super.onBackPressed();
     }
 
-    private Activity getActivityFromComponentName(ComponentName componentName) {
-        try {
-            Class<?> activityClass = Class.forName(componentName.getClassName());
-            return (Activity) activityClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    private void setVariables() {
+        binding.loginBtn.setOnClickListener(v -> loginUser());
+
+        binding.forgetPassBtn.setOnClickListener(v -> resetPassword());
     }
 
-    private void toSignUp() {
-        binding.toSignUpBtn.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
-    }
+    private void loginUser() {
+        String email = binding.userEdt.getText().toString().trim();
+        String password = binding.passEdt.getText().toString().trim();
 
-    private void setVariable() {
-        binding.loginBtn.setOnClickListener(v -> {
-            String email=binding.userEdt.getText().toString();
-            String password=binding.passEdt.getText().toString();
-            if(!email.isEmpty() && !password.isEmpty()){
-                mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(LoginActivity.this, task -> {
-                    if(task.isSuccessful()){
-                        String loggedInUserEmail = mAuth.getCurrentUser().getEmail();
+        if (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches() && !TextUtils.isEmpty(password)) {
+            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null && user.isEmailVerified()) {
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
-                    }else{
-                        Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }else{
-                Toast.makeText(LoginActivity.this, "Please fill username and password", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        binding.forgetPassBtn.setOnClickListener(v -> {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            String email = binding.userEdt.getText().toString();
-            if (!email.equals("")) {
-
-
-                auth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Email sent!", Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
-                        Toast.makeText(this, "Your email is not exist!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Please verify your email address!", Toast.LENGTH_SHORT).show();
                     }
-                });
-            } else {
-                Toast.makeText(this, "Please enter email!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                } else {
+                    String errorMessage = task.getException().getMessage();
+                    Toast.makeText(LoginActivity.this, "Authentication failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(LoginActivity.this, "Please enter valid email and password", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void resetPassword() {
+        String email = binding.userEdt.getText().toString().trim();
+        if (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(this, "Password reset email sent!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Failed to send password reset email!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "Please enter a valid email address!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
