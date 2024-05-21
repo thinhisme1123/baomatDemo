@@ -11,15 +11,20 @@ import com.example.finalmobileproject.R;
 import com.example.finalmobileproject.databinding.ActivitySignupBinding;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SignupActivity extends BaseActivity {
     ActivitySignupBinding binding;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySignupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mAuth = FirebaseAuth.getInstance();
 
         setVariable();
         toLogin();
@@ -47,6 +52,13 @@ public class SignupActivity extends BaseActivity {
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(SignupActivity.this, task -> {
                 if (task.isSuccessful()) {
                     Log.i(TAG, "User registration successful");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    user.sendEmailVerification()
+                            .addOnCompleteListener(task1 -> {
+                                if (task1.isSuccessful()) {
+                                    Toast.makeText(SignupActivity.this, "Check mail for verifying", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                     startActivity(new Intent(SignupActivity.this, MainActivity.class));
                     finish(); // Đăng ký thành công, kết thúc activity này
                 } else {
