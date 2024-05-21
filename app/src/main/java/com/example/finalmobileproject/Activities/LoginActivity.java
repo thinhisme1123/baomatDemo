@@ -23,6 +23,8 @@ public class LoginActivity extends BaseActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        binding.toSignUpBtn.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
+
         setVariables();
     }
 
