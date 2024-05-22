@@ -59,8 +59,9 @@ public class SignupActivity extends BaseActivity {
                                     Toast.makeText(SignupActivity.this, "Check mail for verifying", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                    startActivity(new Intent(SignupActivity.this, MainActivity.class));
-                    finish(); // Đăng ký thành công, kết thúc activity này
+                    startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+                    Toast.makeText(SignupActivity.this, "Signup successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
                     Log.e(TAG, "User registration failed", task.getException());
                     String errorMessage = task.getException().getMessage();
