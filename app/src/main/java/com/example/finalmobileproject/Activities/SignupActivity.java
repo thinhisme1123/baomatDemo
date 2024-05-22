@@ -38,6 +38,7 @@ public class SignupActivity extends BaseActivity {
         binding.signupBtn.setOnClickListener(v -> {
             String email = binding.userEdt.getText().toString();
             String password = binding.passEdt.getText().toString();
+            String confirmPassword = binding.confirmPassEdt.getText().toString();
 
             if (!isValidEmail(email)) {
                 Toast.makeText(SignupActivity.this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
@@ -46,6 +47,11 @@ public class SignupActivity extends BaseActivity {
 
             if (TextUtils.isEmpty(password) || password.length() < 6) {
                 Toast.makeText(SignupActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(SignupActivity.this, "Password does not matches", Toast.LENGTH_SHORT).show();
                 return;
             }
 
