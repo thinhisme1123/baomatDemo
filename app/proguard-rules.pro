@@ -8,22 +8,58 @@
     public static int e(...);
 }
 
-# Đảm bảo không mã hóa các class và phương thức được sử dụng trong Annotation
+# Rút gọn tên lớp, phương thức và biến
 -keepattributes *Annotation*
--keepclassmembers class * {
-    @com.example.annotation.* <methods>;
-}
+-keepattributes Exceptions
+-keepattributes InnerClasses
+-keepattributes Signature
+-keepattributes SourceFile,LineNumberTable
 
-# Không mã hóa và loại bỏ các class được sử dụng trong AndroidManifest.xml
--keep class com.example.activities.MainActivity { *; }
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+-keep class * extends java.lang.annotation.Annotation { *; }
+
+
+# Bảo vệ tất cả các lớp trong gói com.example.finalmobileproject
+-keep class com.example.finalmobileproject.** { *; }
 
 # Không loại bỏ các class và phương thức sử dụng Reflection
 -keep class com.example.reflection.** { *; }
 -dontwarn com.example.reflection.**
 
-# Không loại bỏ các class và phương thức trong package com.example.models
--keep class com.example.models.** { *; }
+# Quy tắc ProGuard cho Gson
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
 
-# Không loại bỏ các thư viện bên thứ ba
--keep class org.example.library.** { *; }
--dontwarn org.example.library.**
+# Quy tắc ProGuard cho Glide
+-keep class com.bumptech.glide.** { *; }
+-dontwarn com.bumptech.glide.**
+
+# Quy tắc ProGuard cho Firebase Auth
+-keep class com.google.firebase.auth.** { *; }
+-dontwarn com.google.firebase.auth.**
+
+# Quy tắc ProGuard cho Firebase Database
+-keep class com.google.firebase.database.** { *; }
+-dontwarn com.google.firebase.database.**
+
+# Giữ lại các lớp liên quan đến view binding
+-keep class **.databinding.* { *; }
+-keep class **.viewbinding.* { *; }
+
+# Quy tắc ProGuard cho AppCompat
+-keep class androidx.appcompat.** { *; }
+-dontwarn androidx.appcompat.**
+
+# Quy tắc ProGuard cho Material Components
+-keep class com.google.android.material.** { *; }
+-dontwarn com.google.android.material.**
+
+# Quy tắc ProGuard cho ConstraintLayout
+-keep class androidx.constraintlayout.** { *; }
+-dontwarn androidx.constraintlayout.**
+
+# Giữ lại các lớp liên quan đến test nếu cần thiết
+-keep class androidx.test.** { *; }
+-dontwarn androidx.test.**
+
